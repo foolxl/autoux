@@ -141,6 +141,7 @@ Gets you a structured report with scores, critiques, and prioritized suggestions
 |---------|-------------|
 | `/autoux` | Run the autonomous optimization loop with custom config |
 | `/autoux:auto` | Zero-config mode — auto-detect everything, improve to enterprise-grade |
+| `/autoux:svg` | Generate and refine SVGs from a one-line description (logos, icons, plots) |
 | `/autoux:plan` | Interactive wizard to build a configuration |
 | `/autoux:review` | One-shot design review (read-only, no code changes) |
 | `/autoux:compare` | A/B comparison between branches or commits |

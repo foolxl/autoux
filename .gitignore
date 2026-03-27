@@ -4,6 +4,7 @@ ref/
 # AutoUX runtime artifacts
 autoux-results.tsv
 /autoux/
+autoux-svg-preview.html
 
 # Node
 node_modules/

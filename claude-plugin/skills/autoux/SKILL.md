@@ -14,7 +14,7 @@ Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) 
 
 **CRITICAL — READ THIS FIRST BEFORE ANY ACTION:**
 
-For ALL commands (`/autoux`, `/autoux:auto`, `/autoux:plan`, `/autoux:review`, `/autoux:compare`):
+For ALL commands (`/autoux`, `/autoux:auto`, `/autoux:svg`, `/autoux:plan`, `/autoux:review`, `/autoux:compare`):
 
 1. **Check if the user provided ALL required context inline** (Goal, Scope, Page, etc.)
 2. **If ANY required context is missing → you MUST use `AskUserQuestion` to collect it BEFORE proceeding to any execution phase.** DO NOT skip this step. DO NOT proceed without user input.
@@ -26,6 +26,7 @@ For ALL commands (`/autoux`, `/autoux:auto`, `/autoux:plan`, `/autoux:review`, `
 | `/autoux:auto` | None — zero config | Single confirmation only (auto-detects everything) |
 | `/autoux:plan` | Goal | Ask via `AskUserQuestion` per `references/plan-workflow.md` |
 | `/autoux:review` | Page | Ask via `AskUserQuestion` per `references/review-workflow.md` |
+| `/autoux:svg` | Describe (text description) | Ask via `AskUserQuestion` per `references/svg-workflow.md` |
 | `/autoux:compare` | Page, Branch-A/B or Commit-A/B | Ask via `AskUserQuestion` per `references/compare-workflow.md` |
 
 **YOU MUST NOT start any loop, phase, or execution without completing interactive setup when context is missing. This is a BLOCKING prerequisite.**
@@ -38,7 +39,42 @@ For ALL commands (`/autoux`, `/autoux:auto`, `/autoux:plan`, `/autoux:review`, `
 | `/autoux:auto` | **Zero-config mode.** Auto-detects everything, improves entire frontend to enterprise-grade quality |
 | `/autoux:plan` | Interactive wizard to configure Page, Scope, Viewports, Rubric from a Goal |
 | `/autoux:review` | One-shot design review: capture screenshots, run judge panel, output structured report |
+| `/autoux:svg` | **SVG generator.** Generate and refine logos, icons, plots from a one-line description |
 | `/autoux:compare` | A/B comparison of two design states (branches or commits) using the judge panel |
+
+### /autoux:svg — SVG Generation & Refinement
+
+Generate and iteratively refine SVG images from a one-line text description. Supports logos, icons, plots, illustrations, diagrams.
+
+Load: `references/svg-workflow.md` for full protocol.
+
+**What it does:**
+
+1. **Generate** — create initial SVG from your text description
+2. **Render** — wrap SVG in HTML, screenshot via Playwright at multiple sizes (64px, 400px, 800px)
+3. **Judge** — 4 SVG-specific personas evaluate: Clarity (hard gate), Craft (1-10), Style (1-10), Intent (1-10)
+4. **Iterate** — refine based on judge critiques, keep/discard, repeat
+
+**Usage:**
+```
+# Just describe what you want
+/autoux:svg minimalist mountain logo, earth tones
+
+# With options
+/autoux:svg Describe: blue tech company logo with circuit patterns Output: logo.svg Iterations: 20
+
+# Icons
+/autoux:svg a cute cat icon for a pet app
+
+# Charts/plots
+/autoux:svg bar chart showing Q1-Q4 revenue growth
+```
+
+**Judge panel (SVG-specific):**
+- **Clarity Judge** (hard gate) — readable at 64x64? No broken paths?
+- **Craft Judge** (0.35) — path precision, symmetry, geometric consistency
+- **Style Judge** (0.35) — color harmony, visual appeal, modern feel
+- **Intent Judge** (0.30) — does it match your description?
 
 ### /autoux:auto — Zero-Config Enterprise-Grade Optimization
 
@@ -158,8 +194,10 @@ Goal: Make the checkout flow feel more premium
 - User invokes `/autoux:auto` → run zero-config auto mode
 - User invokes `/autoux:plan` → run the planning wizard
 - User invokes `/autoux:review` → run one-shot design review
+- User invokes `/autoux:svg` → run SVG generation
 - User invokes `/autoux:compare` → run A/B comparison
 - User says "improve the design", "make this look better", "optimize the UI" → run the loop
+- User says "make a logo", "generate an icon", "create an SVG", "draw a" → run SVG generation
 - User says "just make it look good", "make this professional", "enterprise grade" → run auto mode
 - User says "review the design", "how does this look", "design feedback" → run one-shot review
 - User says "compare designs", "which looks better", "A/B test" → run comparison
