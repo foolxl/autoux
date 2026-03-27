@@ -87,6 +87,14 @@ cp -r /tmp/autoux/claude-plugin/commands/autoux ~/.claude/commands/autoux
 cp /tmp/autoux/claude-plugin/commands/autoux.md ~/.claude/commands/autoux.md
 ```
 
+### Updating
+
+```
+/plugin update autoux
+```
+
+Then start a new Claude Code session to activate changes.
+
 ---
 
 ## Quick Start
