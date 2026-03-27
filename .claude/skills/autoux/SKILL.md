@@ -1,7 +1,7 @@
 ---
 name: autoux
 description: Autonomous UI Design Optimization. Iteratively improve visual design using LLM-as-Judge evaluation with Playwright MCP. Modify code, render screenshots, evaluate against multi-dimensional rubric, keep/discard, repeat.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # AutoUX — Autonomous UI Design Optimization
