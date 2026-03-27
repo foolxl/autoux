@@ -1,7 +1,7 @@
 ---
 name: autoux
 description: Autonomous UI Design Optimization. Iteratively improve visual design using LLM-as-Judge evaluation with Playwright MCP. Modify code, render screenshots, evaluate against multi-dimensional rubric, keep/discard, repeat.
-version: 1.2.0
+version: 1.3.0
 ---
 
 # AutoUX — Autonomous UI Design Optimization
@@ -255,7 +255,7 @@ Scan the project first for smart defaults (look for CSS files, component directo
 2. **Read design reference files** — `context/design-principles.md` and `context/style-guide.md` if they exist
 3. **Verify Playwright MCP** — test navigate to Page URL, confirm non-error response
 4. **Create output directory** — `autoux/{YYMMDD}-{HHMM}-{slug}/` for screenshots and judgments
-5. **Establish baseline** — Render screenshots at all viewports, run full judge panel, record as iteration #0
+5. **Establish baseline** — Spawn `@ux-judge` subagent to render + evaluate, record scores as iteration #0
 6. **Create results log** — Initialize `autoux-results.tsv` with baseline entry
 7. **Show baseline scores** — Display starting scores to user, confirm and BEGIN THE LOOP
 
@@ -269,18 +269,20 @@ LOOP (FOREVER or N times):
   2. Ideate: Pick next visual change guided by judge critiques ("gradient")
   3. Modify: Make ONE focused visual change to in-scope files
   4. Commit: Git commit the change (before rendering)
-  5. Render: Navigate to page via Playwright, capture screenshots at all viewports
-  6. Judge: Run LLM-as-Judge panel — 4 specialized personas evaluate screenshots
-  7. Decide:
-     - ALL hard gates pass AND composite improved → Keep commit, update baseline
-     - ANY hard gate fails → Discard (veto — no override)
-     - Composite unchanged or worse → Discard
-     - Pareto improvement (no dimension worse, at least one better) → Keep
-  8. Log: Record all scores + verdict + critique summary to results TSV + judgment JSON
-  9. Repeat: Go to step 1.
+  5. Evaluate: Spawn @ux-judge subagent with Page URL + baseline scores
+     → Subagent renders via Playwright, screenshots, judges, returns JSON verdict
+     → Screenshots stay in subagent context (discarded after), main loop stays lean
+  6. Decide: Parse verdict JSON from subagent
+     - verdict "keep" → Keep commit, update baseline scores
+     - verdict "discard" → git revert, read next_suggestion for guidance
+     - verdict "crash" → check dev server, revert, retry or move on
+  7. Log: Record scores + verdict + critique to results TSV + save judgment JSON
+  8. Repeat: Go to step 1.
      - If unbounded: NEVER STOP. NEVER ASK "should I continue?"
      - If bounded (N): Stop after N iterations, print final summary
 ```
+
+**Why subagent?** Each screenshot is ~100K+ tokens of image data. Over 10+ iterations, that would overflow the main context. The `@ux-judge` subagent gets a fresh context each time, holds the heavy screenshots, and returns only ~20 lines of JSON. The main loop stays lean for hundreds of iterations.
 
 ## Critical Rules
 

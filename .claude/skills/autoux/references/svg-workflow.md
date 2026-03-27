@@ -67,12 +67,8 @@ Use `AskUserQuestion`:
 2. Read style-guide.md if it exists (for color/style guidance)
 3. Generate initial SVG code based on the description
 4. Write to output file
-5. Render via Playwright:
-   a. Navigate to autoux-svg-preview.html
-   b. Wait for SVG to load
-   c. Screenshot at configured size
-6. Run SVG judge panel (baseline)
-7. Log as iteration 0
+5. Spawn @svg-judge subagent to render + evaluate (baseline)
+6. Log subagent's JSON verdict as iteration 0
 ```
 
 ### Step 3: Optimization Loop
@@ -103,21 +99,15 @@ Priority order:
 **Phase 4: Commit**
 - `git commit -m "experiment(svg): <description>"`
 
-**Phase 5: Render**
-```
-1. Navigate to autoux-svg-preview.html (file:// or local server)
-2. Wait for SVG image to load
-3. Screenshot at multiple sizes:
-   a. Full size (configured, default 400x400)
-   b. Small size (64x64) — for readability/icon check
-   c. Large size (800x800) — for detail check
-4. All three screenshots available for judge evaluation
-```
+**Phase 5 + 5.5: Evaluate (via @svg-judge subagent)**
 
-**Phase 5.5: Judge**
-- Run SVG-specific judge panel (see below)
-- Compare against baseline (last kept state)
-- Produce structured JSON verdict
+Spawn the `@svg-judge` subagent with:
+- SVG file path, preview HTML path
+- Original description text
+- Baseline scores from last kept iteration
+- Iteration number
+
+The subagent renders at 64/400/800px, runs the SVG judge panel, and returns a compact JSON verdict. Screenshots stay in the subagent's context — the main loop only receives the JSON.
 
 **Phase 6-8: Decide, Log, Repeat**
 - Same as main autoux protocol

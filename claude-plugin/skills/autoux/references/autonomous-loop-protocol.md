@@ -147,77 +147,77 @@ git commit -m "experiment(ui): <one-sentence description>"
 2. If fixable (lint, formatting): fix and retry — do NOT use `--no-verify`
 3. If not fixable within 2 attempts: log as `no-op`, revert changes, move to next iteration
 
-## Phase 5: Render (Playwright MCP)
+## Phase 5 + 5.5: Render & Judge (via Subagent)
 
-This phase replaces autoresearch's "Verify" phase. Instead of running a shell command and parsing a number, we render the page and capture screenshots.
+**CRITICAL: Render and Judge happen in a SUBAGENT, not in the main loop context.**
+
+Screenshots are large multimodal tokens that would overflow the main loop's context over many iterations. Instead, spawn the `@ux-judge` subagent for each evaluation. The subagent renders, screenshots, judges, and returns a compact JSON verdict. Its context (with the heavy images) is discarded after.
+
+### How to invoke
+
+Spawn the `@ux-judge` subagent with this information:
 
 ```
-1. NAVIGATE
-   mcp__playwright__browser_navigate(url=Page)
-
-2. WAIT
-   mcp__playwright__browser_wait_for(selector="body", timeout=10000)
-   # Wait for page to fully load — content, styles, fonts
-
-3. SCREENSHOT EACH VIEWPORT
-   FOR viewport IN configured_viewports:
-     a. mcp__playwright__browser_resize(width, height)
-        Desktop: 1440 x 900
-        Tablet:  768 x 1024
-        Mobile:  375 x 812
-     b. Wait 500ms for CSS reflow and transitions
-     c. mcp__playwright__browser_take_screenshot()
-        → Screenshot is returned as image data in context
-        → Also save to: autoux/{run}/screenshots/iter-{N}-{viewport}.png
-
-4. CAPTURE CONSOLE
-   mcp__playwright__browser_console_messages()
-   → Capture any JavaScript errors for console_gate
-
-5. CAPTURE DOM
-   mcp__playwright__browser_snapshot()
-   → DOM structure for accessibility analysis (semantic HTML, ARIA labels)
+Page: {page_url}
+Viewports: desktop (1440x900), tablet (768x1024), mobile (375x812)
+Iteration: {N}
+Change: {one-sentence description of what was modified}
+Baseline scores: {composite: X.X, ux_friction: N, visual_polish: N, brand_alignment: N}
+Design refs: context/design-principles.md, context/style-guide.md
 ```
 
-**Dev server crash handling:** If the page fails to load:
+The subagent will:
+1. Navigate to the page via Playwright MCP
+2. Screenshot at each viewport
+3. Check hard gates (console errors, layout integrity, accessibility)
+4. Score soft dimensions (UX friction, visual polish, brand alignment)
+5. Compute composite and verdict
+6. Return a JSON verdict
+
+### What comes back
+
+The subagent returns ONLY a compact JSON:
+
+```json
+{
+  "iteration": 3,
+  "hard_gates": {"accessibility": "pass", "layout_integrity": "pass", "console_errors": "pass"},
+  "gate_issues": [],
+  "soft_scores": {
+    "ux_friction": {"score": 7, "critique": "...", "suggestion": "..."},
+    "visual_polish": {"score": 6, "critique": "...", "suggestion": "..."},
+    "brand_alignment": {"score": 7, "critique": "...", "suggestion": "..."}
+  },
+  "composite": 6.65,
+  "composite_delta": 0.75,
+  "verdict": "keep",
+  "reason": "...",
+  "next_suggestion": "..."
+}
+```
+
+### What the main loop does with it
+
+1. Parse the verdict JSON
+2. Save it to `autoux/{run}/judgments/iter-{N}-judgment.json`
+3. Use `verdict` for the keep/discard decision (Phase 6)
+4. Use `next_suggestion` to guide ideation in the next iteration (Phase 2)
+5. Update baseline scores if verdict is "keep"
+
+**The main loop NEVER holds screenshots in its context.** Only the compact JSON verdict persists.
+
+### Dev server crash handling
+
+If the subagent returns `{"verdict": "crash", "reason": "..."}`:
 1. Check if dev server is still running
-2. If crashed: attempt restart (max 2 tries), wait for server ready, retry render
+2. If crashed: attempt restart (max 2 tries), wait for server ready, re-spawn subagent
 3. If still failing: log as "crash", revert commit, move to next iteration
 
-**Rendering speed:** The render phase should take ~5-15 seconds (navigate + wait + 3 screenshots + console + DOM). If it takes longer, check for slow dev server or heavy page.
+### Baseline management
 
-## Phase 5.5: Judge (LLM-as-Judge Evaluation)
-
-This phase replaces autoresearch's "Guard" phase. Instead of running a guard command, the agent evaluates its own screenshots using the judge panel.
-
-**Execute the full evaluation protocol from `references/judge-system.md`:**
-
-```
-1. HARD GATES (fast, stop early on failure)
-   a. Console Gate — check browser_console_messages for JS errors
-   b. Layout Gate — examine screenshots for overflow/overlap
-   c. Accessibility Gate — analyze screenshots + DOM snapshot for WCAG violations
-
-   → If ANY gate fails: verdict = "discard", skip soft scoring
-
-2. SOFT SCORING (only if all gates pass)
-   a. Adopt UX Friction Judge persona → evaluate → JSON
-   b. Adopt Visual Polish Judge persona → evaluate → JSON
-   c. Adopt Brand Alignment Judge persona → evaluate → JSON
-   d. Aggregate: worst score across viewports for each dimension
-
-3. META-JUDGE SYNTHESIS
-   a. Compute composite score and delta
-   b. Apply decision logic
-   c. Generate next_suggestion
-   d. Save full judgment JSON
-
-→ Output: verdict (keep/discard) + full judgment JSON
-```
-
-**Baseline comparison:** ALWAYS compare against the last kept state (baseline), not the previous attempt. The baseline screenshots are updated only when a change is kept.
-
-**Context management:** Evaluate one viewport at a time if context window pressure is high. Summarize each viewport's judgment before moving to the next.
+- Baseline scores start at iteration 0 (first subagent evaluation)
+- Updated ONLY when verdict is "keep" — use the kept iteration's scores as new baseline
+- Pass baseline scores to the subagent each time so it can compute deltas
 
 ## Phase 6: Decide (No Ambiguity)
 
