@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "autoux",
-      "description": "Autonomous UI design optimizer: /autoux:auto runs zero-config enterprise-grade improvement. Also includes /autoux (configurable loop), /autoux:plan (setup wizard), /autoux:review (one-shot design review), and /autoux:compare (A/B comparison). Uses multi-dimensional LLM-as-Judge panel with Playwright MCP screenshots — no external APIs.",
+      "description": "Autonomous UI design optimizer: /autoux:auto runs zero-config enterprise-grade improvement. Also includes /autoux:svg (generate SVGs from text), /autoux (configurable loop), /autoux:plan (setup wizard), /autoux:review (one-shot design review), and /autoux:compare (A/B comparison). Uses multi-dimensional LLM-as-Judge panel with Playwright MCP screenshots — no external APIs.",
       "version": "1.1.0",
       "author": {
         "name": "foolxl",

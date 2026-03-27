@@ -1,6 +1,6 @@
 {
   "name": "autoux",
-  "description": "Autonomous UI Design Optimization for Claude Code. Runs an LLM-as-Judge evaluation loop with Playwright MCP screenshots to iteratively improve frontend design. 5 commands: auto, plan, review, compare, and the main loop.",
+  "description": "Autonomous UI Design Optimization for Claude Code. Runs an LLM-as-Judge evaluation loop with Playwright MCP screenshots to iteratively improve frontend design. 6 commands: auto, svg, plan, review, compare, and the main loop.",
   "version": "1.1.0",
   "author": {
     "name": "foolxl",
