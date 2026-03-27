@@ -1,10 +1,13 @@
 # Reference materials (not part of the project)
 ref/
 
-# AutoUX runtime artifacts
-autoux-results.tsv
-/autoux/
+# AutoUX temporary files (NOT history — history is tracked)
 autoux-svg-preview.html
+
+# These ARE tracked (persistent history):
+# autoux-history.md    — plain-text run history
+# autoux-results.tsv   — machine-readable log
+# autoux/iterations/   — file snapshots per iteration
 
 # Node
 node_modules/

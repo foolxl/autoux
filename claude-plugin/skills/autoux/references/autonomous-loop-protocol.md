@@ -38,9 +38,15 @@ git symbolic-ref HEAD 2>/dev/null || echo "WARN: detached HEAD"
 # → Look for context/design-principles.md and context/style-guide.md
 # → If missing: warn but proceed (Brand Alignment judge will evaluate internal consistency)
 
-# 7. Create output directory
-# → mkdir -p autoux/{YYMMDD}-{HHMM}-{slug}/screenshots
-# → mkdir -p autoux/{YYMMDD}-{HHMM}-{slug}/judgments
+# 7. Create iterations directory
+# → mkdir -p autoux/iterations
+
+# 8. Check for existing history (RESUME SUPPORT)
+# → If autoux-history.md exists AND last run status == "in-progress":
+#    Ask user: "Resume from iteration {N} or start fresh?"
+#    If resume: read baseline scores and iteration count from history
+# → If no history: create autoux-history.md with header
+# → Start new run section in autoux-history.md
 ```
 
 **If any FAIL:** Stop and inform user. Do not enter the loop with broken preconditions.
@@ -52,15 +58,15 @@ Before each iteration, build situational awareness. **You MUST complete ALL step
 
 ```
 1. Read current state of in-scope files (full context)
-2. Read last 10-20 entries from autoux-results.tsv
-3. MUST run: git log --oneline -20 to see recent experiment history
-4. MUST run: git diff HEAD~1 (if last iteration was "keep") to review what worked
-5. MUST read: previous iteration's judgment JSON — specifically:
+2. Read autoux-history.md — last 10-20 rows of current run table
+3. Read autoux-results.tsv — scan for patterns (consecutive discards, trending scores)
+4. MUST run: git log --oneline -20 to see recent experiment history
+5. MUST run: git diff HEAD~1 (if last iteration was "keep") to review what worked
+6. MUST read: autoux/iterations/iter-{last}/judgment.json — specifically:
    - critique and suggestion from each judge persona
    - the next_suggestion field (this is your "gradient")
-   - any conflict flags between judges
-6. Read design-principles.md and style-guide.md for reference context
-7. If bounded: check current_iteration vs max_iterations
+7. Read design-principles.md and style-guide.md for reference context
+8. If bounded: check current_iteration vs max_iterations
 ```
 
 **Why read judgment critiques every time?** The critique IS the gradient. It tells you exactly what each judge persona found lacking and what they suggest trying next. Without reading it, you're iterating blind — randomly trying changes instead of systematically addressing identified weaknesses.
@@ -266,17 +272,34 @@ ELIF crashed:
 - `git reset --hard` destroys the commit — the agent loses memory of what was attempted
 - `git revert` is non-destructive and safer in Claude Code
 
-## Phase 7: Log Results
+## Phase 7: Log & Archive Results
 
-Append to results log (TSV format from `references/results-logging.md`):
+**CRITICAL: ALL 6 steps happen EVERY iteration, including discards. Never skip archiving.**
 
-```tsv
-{iteration}	{commit}	{a11y}	{layout}	{console}	{ux}	{polish}	{brand}	{composite}	{verdict}	{critique_summary}
+```
+1. ARCHIVE iteration files:
+   mkdir -p autoux/iterations/iter-{NNN}-{verdict}/snapshot
+   cp {each in-scope file} autoux/iterations/iter-{NNN}-{verdict}/snapshot/
+   git diff HEAD~1 > autoux/iterations/iter-{NNN}-{verdict}/diff.patch  (if commit exists)
+
+2. SAVE judgment JSON:
+   Write subagent verdict to autoux/iterations/iter-{NNN}-{verdict}/judgment.json
+
+3. APPEND to autoux-results.tsv:
+   {run}\t{iteration}\t{commit}\t{gates}\t{scores}\t{composite}\t{verdict}\t{change}\t{critique}
+
+4. APPEND row to autoux-history.md (current run's table)
+
+5. UPDATE status line in autoux-history.md:
+   **Status:** in-progress (iteration {N})
+
+6. Print one-line status:
+   "Iteration {N}: {KEEP/DISCARD} — {reason} (composite: {score})"
 ```
 
-Save full judgment JSON to `autoux/{run}/judgments/iter-{N}-judgment.json`.
-
 **Valid statuses:** `baseline`, `keep`, `discard`, `crash`, `no-op`
+
+**Iteration numbering:** Use zero-padded 3-digit format (000, 001, 002...) for directory names so they sort correctly.
 
 ## Phase 8: Repeat
 
