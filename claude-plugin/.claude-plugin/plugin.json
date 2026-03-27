@@ -1,0 +1,21 @@
+{
+  "name": "autoux",
+  "description": "Autonomous UI Design Optimization for Claude Code. Runs an LLM-as-Judge evaluation loop with Playwright MCP screenshots to iteratively improve frontend design. 5 commands: auto, plan, review, compare, and the main loop.",
+  "version": "1.0.0",
+  "author": {
+    "name": "foolxl",
+    "url": "https://github.com/foolxl"
+  },
+  "repository": "https://github.com/foolxl/autoux",
+  "license": "MIT",
+  "homepage": "https://github.com/foolxl/autoux",
+  "keywords": [
+    "autonomous",
+    "ui",
+    "ux",
+    "design",
+    "optimization",
+    "playwright",
+    "llm-as-judge"
+  ]
+}

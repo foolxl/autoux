@@ -62,24 +62,29 @@ claude mcp add playwright -- npx @anthropic-ai/mcp-playwright
 
 ### Install AutoUX
 
-**Option 1: Clone into your project** (recommended for customization)
+**Option A: Plugin install** (recommended)
 
-```bash
-# From your project root
-git clone https://github.com/user/autoux /tmp/autoux
-cp -r /tmp/autoux/.claude/skills/autoux .claude/skills/autoux
-cp -r /tmp/autoux/.claude/commands/autoux .claude/commands/autoux
-cp /tmp/autoux/.claude/commands/autoux.md .claude/commands/autoux.md
-cp -r /tmp/autoux/context ./context  # optional — template design refs
+In Claude Code, run:
+
+```
+/plugin marketplace add foolxl/autoux
+/plugin install autoux@autoux
 ```
 
-**Option 2: Global install** (available in all projects)
+**Option B: Manual install** (for customization)
 
 ```bash
-git clone https://github.com/user/autoux /tmp/autoux
-cp -r /tmp/autoux/.claude/skills/autoux ~/.claude/skills/autoux
-cp -r /tmp/autoux/.claude/commands/autoux ~/.claude/commands/autoux
-cp /tmp/autoux/.claude/commands/autoux.md ~/.claude/commands/autoux.md
+# Project-local (current project only)
+git clone https://github.com/foolxl/autoux /tmp/autoux
+cp -r /tmp/autoux/claude-plugin/skills/autoux .claude/skills/autoux
+cp -r /tmp/autoux/claude-plugin/commands/autoux .claude/commands/autoux
+cp /tmp/autoux/claude-plugin/commands/autoux.md .claude/commands/autoux.md
+cp -r /tmp/autoux/context ./context  # optional — template design refs
+
+# Or global (available in all projects)
+cp -r /tmp/autoux/claude-plugin/skills/autoux ~/.claude/skills/autoux
+cp -r /tmp/autoux/claude-plugin/commands/autoux ~/.claude/commands/autoux
+cp /tmp/autoux/claude-plugin/commands/autoux.md ~/.claude/commands/autoux.md
 ```
 
 ---

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "autoux",
+  "version": "1.0.0",
+  "description": "AutoUX — Autonomous UI Design Optimization for Claude Code. Applies Karpathy's autoresearch ratchet loop to visual UI/UX improvement using LLM-as-Judge evaluation with Playwright MCP screenshots.",
+  "owner": {
+    "name": "foolxl",
+    "url": "https://github.com/foolxl"
+  },
+  "plugins": [
+    {
+      "name": "autoux",
+      "description": "Autonomous UI design optimizer: /autoux:auto runs zero-config enterprise-grade improvement. Also includes /autoux (configurable loop), /autoux:plan (setup wizard), /autoux:review (one-shot design review), and /autoux:compare (A/B comparison). Uses multi-dimensional LLM-as-Judge panel with Playwright MCP screenshots — no external APIs.",
+      "version": "1.0.0",
+      "author": {
+        "name": "foolxl",
+        "url": "https://github.com/foolxl"
+      },
+      "source": "./claude-plugin",
+      "category": "productivity"
+    }
+  ]
+}
