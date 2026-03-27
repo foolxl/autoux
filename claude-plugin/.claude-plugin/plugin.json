@@ -1,7 +1,7 @@
 {
   "name": "autoux",
   "description": "Autonomous UI Design Optimization for Claude Code. Runs an LLM-as-Judge evaluation loop with Playwright MCP screenshots to iteratively improve frontend design. 6 commands: auto, svg, plan, review, compare, and the main loop.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": {
     "name": "foolxl",
     "url": "https://github.com/foolxl"
