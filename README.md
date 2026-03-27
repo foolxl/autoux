@@ -71,6 +71,8 @@ In Claude Code, run:
 /plugin install autoux@autoux
 ```
 
+> **Note:** Start a new Claude Code session after installing. Reference files aren't resolvable in the same session where installation happened — this is a Claude Code platform limitation.
+
 **Option B: Manual install** (for customization)
 
 ```bash
