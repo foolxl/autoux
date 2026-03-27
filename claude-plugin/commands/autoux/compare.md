@@ -8,27 +8,20 @@ EXECUTE IMMEDIATELY — do not deliberate.
 
 ## Argument Parsing
 
-Extract from $ARGUMENTS:
-
 - `Page:` — URL to compare
 - `Branch-A:` or `Commit-A:` — first design state (baseline)
 - `Branch-B:` or `Commit-B:` — second design state (variant)
-- `States:` — comma-separated list for multi-state comparison
 - `Viewports:` — comma-separated viewport list (default: desktop,tablet,mobile)
 
 ## Execution
 
-1. Read the compare workflow protocol: `.claude/skills/autoux/references/compare-workflow.md`
-2. Read the judge system protocol: `.claude/skills/autoux/references/judge-system.md`
-3. Read the evaluation rubric: `.claude/skills/autoux/references/rubric.md`
-4. If Page AND both states are provided — proceed directly to comparison
-5. If any required field is missing — use `AskUserQuestion` with batched questions:
-   - Page URL
-   - State A (branch/commit/"current")
-   - State B (branch/commit)
-6. Read design reference files if they exist
-7. Execute the compare workflow: Capture A → Capture B → Judge Both → Compare → Report
-8. Output the structured comparison report with recommendation
-9. Restore the original git state (checkout original branch, pop stash if needed)
+1. If Page AND both states are provided — proceed to step 3
+2. If any required field is missing — use `AskUserQuestion` with batched questions
+3. Read design reference files if they exist
+4. Capture State A: checkout branch/commit → navigate → screenshot → judge
+5. Capture State B: checkout branch/commit → navigate → screenshot → judge
+6. Read `.claude/skills/autoux/references/judge-system.md` for judge personas (if not already read)
+7. Generate side-by-side comparison report with score deltas and recommendation
+8. Restore original git state (checkout original branch, pop stash)
 
-IMPORTANT: This operation switches git branches/commits temporarily. It will restore the original state after comparison. Warn the user if there are uncommitted changes that need to be stashed.
+IMPORTANT: This switches git branches temporarily. Warn if uncommitted changes need stashing.

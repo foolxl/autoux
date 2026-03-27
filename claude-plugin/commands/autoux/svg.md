@@ -8,7 +8,7 @@ EXECUTE IMMEDIATELY — do not deliberate, do not ask clarifying questions befor
 
 ## Argument Parsing (do this FIRST)
 
-Extract from $ARGUMENTS — the user's description may be the entire argument with no prefix. Handle both:
+Extract from $ARGUMENTS — the user's description may be the entire argument with no prefix:
 
 - `Describe:` prefixed — text after "Describe:" keyword
 - No prefix — treat entire argument as the description
@@ -17,29 +17,16 @@ Extract from $ARGUMENTS — the user's description may be the entire argument wi
 - `Background:` — background color for preview (default: `white`)
 - `Iterations:` or `--iterations` — bounded mode
 
-Examples of valid invocations:
-```
-/autoux:svg minimalist mountain logo, earth tones
-/autoux:svg Describe: blue tech company logo with circuit patterns Output: logo.svg
-/autoux:svg a cute cat icon for a pet app Iterations: 15
-```
-
 ## Execution
 
-1. Read the SVG workflow protocol: `.claude/skills/autoux/references/svg-workflow.md`
-2. Read the results logging format: `.claude/skills/autoux/references/results-logging.md`
-3. If description is present — proceed directly
-4. If description is missing — use `AskUserQuestion`:
-   - "What SVG do you want to generate? (describe in one line)"
-   - "Output filename?" (default: output.svg)
-5. Read `context/style-guide.md` if it exists (for color/style guidance)
-6. Create the HTML preview wrapper for Playwright rendering
-7. Generate initial SVG from the description
-8. Run the SVG judge panel for baseline
-9. Execute the optimization loop: Modify SVG → Render → Judge → Keep/Discard → Repeat
-10. Clean up preview HTML when done
+1. If description is present — proceed to step 3
+2. If description is missing — use `AskUserQuestion`: "What SVG do you want? (one line)"
+3. Read `context/style-guide.md` if it exists (for color guidance)
+4. Read `.claude/skills/autoux/references/svg-workflow.md` for judge personas and rendering setup
+5. Create HTML preview wrapper, generate initial SVG from description
+6. Run the SVG optimization loop: Modify SVG → Render via Playwright → Judge → Keep/Discard → Repeat
 
-IMPORTANT: The description is the spec. Re-read it every iteration. Never drift from what the user asked for — the Intent Judge will catch it.
+KEY: Do NOT read all reference files upfront. The svg-workflow.md contains everything needed.
 
 ## Key Rules
 
@@ -47,4 +34,4 @@ IMPORTANT: The description is the spec. Re-read it every iteration. Never drift 
 - Pure vector only — no embedded raster images or base64
 - Keep it minimal — simpler SVGs look more professional
 - Test at 64x64 — if it's not readable small, the Clarity Judge will fail it
-- Respect the description literally — "mountain" means a mountain shape, not an abstract triangle
+- Re-read the description every iteration — never drift from user intent
