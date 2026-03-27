@@ -2,9 +2,23 @@
 
 AutoUX maintains a **persistent plain-text history** that survives across sessions, plus per-iteration **file snapshots** and **judgment archives**.
 
+## Where Files Live
+
+All history and archive files are created in the **user's project directory** (the project being optimized), NOT in the autoux plugin repo.
+
+```
+user-project/                     ← the project being optimized
+  autoux-history.md               ← persistent history (recommend: commit to project repo)
+  autoux-results.tsv              ← machine-readable log (recommend: commit to project repo)
+  autoux/iterations/              ← file snapshots per iteration (recommend: commit to project repo)
+  autoux-svg-preview.html         ← temporary render wrapper (gitignore this)
+```
+
+The user should decide whether to commit these to their project's repo. We recommend committing `autoux-history.md` and `autoux/iterations/` for full traceability.
+
 ## Persistent History File
 
-**File:** `autoux-history.md` (project root, **NOT gitignored** — committed to repo)
+**File:** `autoux-history.md` (user's project root)
 
 This is the single source of truth across all sessions and runs. When you exit and continue later, the agent reads this file to resume where it left off.
 
